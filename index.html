@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz - App</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+    <div class="app">
+        <h1>Simple Quiz</h1>
+        <div class="quiz">
+            <h2 id="question">Question goes here</h2>
+            <div id="answer-buttons">
+                <button class="btn">Answer 1</button>
+                <button class="btn">Answer 2</button>
+                <button class="btn">Answer 3</button>
+                <button class="btn">Answer 4</button>
+            </div>
+            <button id="next-btn">Next</button>
+        </div>
+    </div>
+
+    <script>
+        // Danh sách câu hỏi và câu trả lời
+        const questions= [
+            {
+                question: "Which is larget animal in the world ?",
+                answers : [
+                    { text : "Shark" , correct : false},
+                    { text : "Blue Whale" , correct : true},
+                    { text : "Elephant" , correct : false},
+                    { text : "Giraffe" , correct : false},
+
+                ]
+            },
+
+            {
+                question: "Which is larget animal in the world ?",
+                answers : [
+                    { text : "Shark" , correct : false},
+                    { text : "Blue Whale" , correct : false},
+                    { text : "Elephant" , correct : true},
+                    { text : "Giraffe" , correct : false},
+
+                ]
+            },
+
+            {
+                question: "Which is larget animal in the world ?",
+                answers : [
+                    { text : "Shark" , correct : true},
+                    { text : "Blue Whale" , correct : false},
+                    { text : "Elephant" , correct : false},
+                    { text : "Giraffe" , correct : false},
+
+                ]
+            },
+
+            {
+                question: "Which is larget animal in the world ?",
+                answers : [
+                    { text : "Shark" , correct : false},
+                    { text : "Blue Whale" , correct : false},
+                    { text : "Elephant" , correct : false},
+                    { text : "Giraffe" , correct : true},
+
+                ]
+            }      
+        ];
+
+        // Các phần tử HTML được chọn để thao tác
+        const questionElement = document.getElementById("question");
+        const answerButton = document.getElementById("answer-buttons");
+        const nextButton = document.getElementById("next-btn");
+
+        let currentQuestionIndex = 0; // Chỉ số câu hỏi hiện tại
+        let score = 0; // Điểm số của người dùng
+
+        // Hàm bắt đầu quiz, đặt lại chỉ số câu hỏi và điểm số, hiển thị câu hỏi đầu tiên
+        function startQuiz() {
+            currentQuestionIndex = 0;
+            score = 0;
+            nextButton.innerHTML = 'Next';
+            showQuestion();
+        }
+
+        // Hàm hiển thị câu hỏi hiện tại và các câu trả lời
+        function showQuestion() {
+            resetState(); // Đặt lại trạng thái của các nút câu trả lời
+            let currentQuestion = questions[currentQuestionIndex]; // Lấy câu hỏi hiện tại
+            let questionNo = currentQuestionIndex + 1; // Số thứ tự câu hỏi
+            questionElement.innerHTML = questionNo + ". " + currentQuestion.question;
+
+            // Tạo các nút cho mỗi câu trả lời
+            currentQuestion.answers.forEach(answer => {
+                const button = document.createElement("button");
+                button.innerHTML = answer.text;
+                button.classList.add("btn");
+                answerButton.appendChild(button);
+                if (answer.correct) {
+                    button.dataset.correct = answer.correct; // Gán dữ liệu cho biết câu trả lời đúng
+                }
+                button.addEventListener("click", selectAnswer); // Thêm sự kiện click cho mỗi nút
+            });
+        }
+
+        // Hàm đặt lại trạng thái các nút và ẩn nút "Next"
+        function resetState() {
+            nextButton.style.display = "none";
+            while (answerButton.firstChild) {
+                answerButton.removeChild(answerButton.firstChild);
+            }
+        }
+
+        // Hàm xử lý khi người dùng chọn câu trả lời
+        function selectAnswer(e) {
+            const selectedBtn = e.target; // Nút được chọn
+            const isCorrect = selectedBtn.dataset.correct === "true"; // Kiểm tra xem câu trả lời đúng không
+            if (isCorrect) {
+                selectedBtn.classList.add("correct"); // Đánh dấu nút đúng
+                score++; // Tăng điểm số
+            } else {
+                selectedBtn.classList.add("incorrect"); // Đánh dấu nút sai
+            }
+            // Hiển thị các nút đúng và sai
+            Array.from(answerButton.children).forEach(button => {
+                if (button.dataset.correct === "true") {
+                    button.classList.add("correct");
+                }
+                button.disabled = true; // Vô hiệu hóa các nút sau khi chọn câu trả lời
+            });
+            nextButton.style.display = "block"; // Hiển thị nút "Next"
+        }
+
+        // Hàm hiển thị điểm số sau khi kết thúc quiz
+        function showScore() {
+            resetState();
+            questionElement.innerHTML = `You scored ${score} out of ${questions.length}!`;
+            nextButton.innerHTML = "Play Again!";
+            nextButton.style.display = "block";
+        }
+
+        // Hàm xử lý sự kiện khi nhấn nút "Next"
+        function handleNextButton() {
+            currentQuestionIndex++; // Tăng chỉ số câu hỏi hiện tại
+            if (currentQuestionIndex < questions.length) {
+                showQuestion(); // Hiển thị câu hỏi tiếp theo
+            } else {
+                showScore(); // Hiển thị điểm số
+            }
+        }
+
+        // Sự kiện khi nhấn nút "Next"
+        nextButton.addEventListener('click', () => {
+            if (currentQuestionIndex < questions.length) {
+                handleNextButton();
+            } else {
+                startQuiz(); // Bắt đầu lại quiz
+            }
+        });
+
+        startQuiz(); // Bắt đầu quiz khi trang được tải
+    </script>
+</body>
+</html>
